@@ -10,6 +10,7 @@ using Microsoft.Phone.Shell;
 using GesturesRecognizer.Resources;
 using Microsoft.Devices.Sensors;
 using Microsoft.Xna.Framework;
+using ShakeGestures;
 
 namespace GesturesRecognizer
 {
@@ -30,9 +31,27 @@ namespace GesturesRecognizer
                 startButton.IsEnabled = false;
                 stopButton.IsEnabled = false;
             }
+            // register shake event
+            ShakeGesturesHelper.Instance.ShakeGesture += new EventHandler<ShakeGestureEventArgs>(Instance_ShakeGesture);
+
+            // optional, set parameters
+            ShakeGesturesHelper.Instance.MinimumRequiredMovesForShake = 2;
+
+            // start shake detection
+            ShakeGesturesHelper.Instance.Active = true;
 
             // Exemple de code pour la localisation d'ApplicationBar
             //BuildLocalizedApplicationBar();
+        }
+
+        private void Instance_ShakeGesture(object sender, ShakeGestureEventArgs e)
+        {
+            Dispatcher.BeginInvoke(() =>
+            {
+                ShakeType CurrentShakeType = e.ShakeType;
+                statusTextBlock.Text = CurrentShakeType.ToString();
+
+            });
         }
 
         private void startButton_Click(object sender, RoutedEventArgs e)
@@ -48,7 +67,7 @@ namespace GesturesRecognizer
 
             try
             {
-                statusTextBlock.Text = "starting accelerometer.";
+                //statusTextBlock.Text = "starting accelerometer.";
                 accelerometer.Start();
             }
             catch (InvalidOperationException ex)
@@ -65,7 +84,7 @@ namespace GesturesRecognizer
 
         private void UpdateUI(AccelerometerReading accelerometerReading)
         {
-            statusTextBlock.Text = "getting data";
+            //statusTextBlock.Text = "getting data";
 
             Vector3 acceleration = accelerometerReading.Acceleration;
 
@@ -87,7 +106,7 @@ namespace GesturesRecognizer
             {
                 // Stop the accelerometer.
                 accelerometer.Stop();
-                statusTextBlock.Text = "accelerometer stopped.";
+                //statusTextBlock.Text = "accelerometer stopped.";
             }
         }
     }
