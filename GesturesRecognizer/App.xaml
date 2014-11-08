@@ -8,7 +8,7 @@
     <!--Ressources d'applications-->
     <Application.Resources>
         <local:LocalizedStrings xmlns:local="clr-namespace:GesturesRecognizer" x:Key="LocalizedStrings"/>
-        <ImageBrush x:Key="brackground" ImageSource="/Assets/BackgroundImage.jpg" Opacity="0.75" Stretch="UniformToFill" />
+       <ImageBrush x:Key="brackground" ImageSource="/Assets/BackgroundImage.jpg" Opacity="0.75" Stretch="UniformToFill" /> 
     </Application.Resources>
 
     <Application.ApplicationLifetimeObjects>
