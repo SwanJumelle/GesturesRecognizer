@@ -128,6 +128,12 @@
     <Content Include="Assets\ApplicationIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\BackgroundImage.jpg" />
+    <Content Include="Assets\MusicPlayer\back.png" />
+    <Content Include="Assets\MusicPlayer\DefaultCover.bmp" />
+    <Content Include="Assets\MusicPlayer\next.png" />
+    <Content Include="Assets\MusicPlayer\pause.png" />
+    <Content Include="Assets\MusicPlayer\play.png" />
     <Content Include="Assets\Tiles\FlipCycleTileLarge.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -14,7 +14,7 @@
     shell:SystemTray.IsVisible="True">
 
     <!--LayoutRoot est la grille racine où tout le contenu de la page est placé-->
-    <Grid x:Name="LayoutRoot" Background="Transparent">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource brackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -42,20 +42,26 @@
         <!--TitlePanel contient le nom de l'application et le titre de la page-->
         <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,28">
             <TextBlock Text="Gestures Recognizer" Style="{StaticResource PhoneTextNormalStyle}" Margin="12,0"/>
-            <TextBlock Text="ça pèse" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
+            <TextBlock Text=" Music Player" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}"/>
         </StackPanel>
 
         <!--ContentPanel - placez tout contenu supplémentaire ici-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <Button Content="Start" Height="72" HorizontalAlignment="Left" Margin="20,10,0,0" Name="startButton" VerticalAlignment="Top" Width="160" Click="startButton_Click" />
+            <!-- <Button Content="Start" Height="72" HorizontalAlignment="Left" Margin="20,10,0,0" Name="startButton" VerticalAlignment="Top" Width="160" Click="startButton_Click" />
             <Button Content="Stop" Height="72" HorizontalAlignment="Right" Margin="0,10,20,0" Name="stopButton" VerticalAlignment="Top" Width="160" Click="stopButton_Click"/>
             <TextBlock Height="30" HorizontalAlignment="Left"  Margin="20,100,0,0" Name="xTextBlock" Text="X: 1.0" VerticalAlignment="Top" Foreground="Red" FontSize="28" FontWeight="Bold"/>
             <TextBlock Height="30" HorizontalAlignment="Center"  Margin="0,100,0,0" Name="yTextBlock" Text="Y: 1.0" VerticalAlignment="Top" Foreground="Green" FontSize="28" FontWeight="Bold"/>
             <TextBlock Height="30" HorizontalAlignment="Right"  Margin="0,100,20,0" Name="zTextBlock" Text="Z: 1.0" VerticalAlignment="Top"  Foreground="Blue" FontSize="28" FontWeight="Bold"/>
-            <Line x:Name="xLine" X1="240" Y1="350" X2="340" Y2="350" Stroke="Red" StrokeThickness="4"></Line>
-            <Line x:Name="yLine" X1="240" Y1="350" X2="240" Y2="270" Stroke="Green" StrokeThickness="4"></Line>
-            <Line x:Name="zLine" X1="240" Y1="350" X2="190" Y2="400" Stroke="Blue" StrokeThickness="4"></Line>
             <TextBlock Height="30" HorizontalAlignment="Center" Margin="6,571,6,0" Name="statusTextBlock" Text="Awesome" VerticalAlignment="Top" Width="444" />
+            -->
+            <TextBlock x:Name="artistname_textfield" HorizontalAlignment="Center" VerticalAlignment="Top" Text="Wax Tailor" FontWeight="Bold" FontSize="36" Width="456" TextAlignment="Center" />
+            <TextBlock x:Name="songname_textfield" HorizontalAlignment="Center" VerticalAlignment="Top" Text="Sometimes" FontSize="24" Margin="0,60,0,0" Width="456" TextAlignment="Center" LineHeight="2" Height="60" />
+            <Border BorderBrush="White" BorderThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="7">
+                <Image x:Name="cover_image"  HorizontalAlignment="Center" Height="300" Margin="0,0,0,0" VerticalAlignment="Center" Width="300" Source="/Assets/MusicPlayer/DefaultCover.bmp"/>
+            </Border>
+            <Image x:Name="music_previous_button" Source="/Assets/MusicPlayer/back.png" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="80" Height="80" Margin="80,0,0,50" Tap="music_previous_button_Tap" />
+            <Image x:Name="music_play_button" Source="/Assets/MusicPlayer/play.png" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="80" Height="80" Margin="0,0,0,50" Tap="music_play_button_Tap" />
+            <Image x:Name="music_next_button" Source="/Assets/MusicPlayer/next.png" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="80" Height="80" Margin="0,0,80,50" Tap="music_next_button_Tap" />
         </Grid>
     </Grid>
 

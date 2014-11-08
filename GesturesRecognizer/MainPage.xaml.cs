@@ -27,9 +27,9 @@ namespace GesturesRecognizer
                 // The device on which the application is running does not support
                 // the accelerometer sensor. Alert the user and disable the
                 // Start and Stop buttons.
-                statusTextBlock.Text = "device does not support accelerometer";
+                /*statusTextBlock.Text = "device does not support accelerometer";
                 startButton.IsEnabled = false;
-                stopButton.IsEnabled = false;
+                stopButton.IsEnabled = false;*/
             }
             // register shake event
             ShakeGesturesHelper.Instance.ShakeGesture += new EventHandler<ShakeGestureEventArgs>(Instance_ShakeGesture);
@@ -49,7 +49,7 @@ namespace GesturesRecognizer
             Dispatcher.BeginInvoke(() =>
             {
                 ShakeType CurrentShakeType = e.ShakeType;
-                statusTextBlock.Text = CurrentShakeType.ToString();
+                //statusTextBlock.Text = CurrentShakeType.ToString();
 
             });
         }
@@ -72,7 +72,7 @@ namespace GesturesRecognizer
             }
             catch (InvalidOperationException ex)
             {
-                statusTextBlock.Text = "unable to start accelerometer.";
+                //statusTextBlock.Text = "unable to start accelerometer.";
             }
         }
 
@@ -87,7 +87,7 @@ namespace GesturesRecognizer
             //statusTextBlock.Text = "getting data";
 
             Vector3 acceleration = accelerometerReading.Acceleration;
-
+            /*
             // Show the numeric values.
             xTextBlock.Text = "X: " + acceleration.X.ToString("0.00");
             yTextBlock.Text = "Y: " + acceleration.Y.ToString("0.00");
@@ -97,7 +97,7 @@ namespace GesturesRecognizer
             xLine.X2 = xLine.X1 + acceleration.X * 200;
             yLine.Y2 = yLine.Y1 - acceleration.Y * 200;
             zLine.X2 = zLine.X1 - acceleration.Z * 100;
-            zLine.Y2 = zLine.Y1 + acceleration.Z * 100;
+            zLine.Y2 = zLine.Y1 + acceleration.Z * 100;*/
         }
 
         private void stopButton_Click(object sender, RoutedEventArgs e)
@@ -109,5 +109,21 @@ namespace GesturesRecognizer
                 //statusTextBlock.Text = "accelerometer stopped.";
             }
         }
+
+        private void music_play_button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+
+        }
+
+        private void music_previous_button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+
+        }
+
+        private void music_next_button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+
+        }
+
     }
 }
