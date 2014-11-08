@@ -11,37 +11,66 @@ using GesturesRecognizer.Resources;
 using Microsoft.Devices.Sensors;
 using Microsoft.Xna.Framework;
 using ShakeGestures;
+using Microsoft.Xna.Framework.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace GesturesRecognizer
 {
     public partial class MainPage : PhoneApplicationPage
     {
-        Accelerometer accelerometer;
+        private SongCollection songCollection;
+        private BitmapImage playButton_Image;
+        private BitmapImage pauseButton_Image;
+
         // Constructeur
         public MainPage()
         {
             InitializeComponent();
+            DispatcherTimer XnaDispatchTimer = new DispatcherTimer();
+            XnaDispatchTimer.Interval = TimeSpan.FromMilliseconds(50);
 
-            if (!Accelerometer.IsSupported)
+            XnaDispatchTimer.Tick += delegate
             {
-                // The device on which the application is running does not support
-                // the accelerometer sensor. Alert the user and disable the
-                // Start and Stop buttons.
-                /*statusTextBlock.Text = "device does not support accelerometer";
-                startButton.IsEnabled = false;
-                stopButton.IsEnabled = false;*/
+                try
+                {
+                    FrameworkDispatcher.Update();
+                }
+                catch { }
+            };
+
+            XnaDispatchTimer.Start();
+            this.Loaded += new RoutedEventHandler(MainPage_Loaded);
+
+            playButton_Image = new BitmapImage();
+            playButton_Image.SetSource(Application.GetResourceStream(new Uri(@"Assets/MusicPlayer/play.png", UriKind.Relative)).Stream);
+            pauseButton_Image = new BitmapImage();
+            pauseButton_Image.SetSource(Application.GetResourceStream(new Uri(@"Assets/MusicPlayer/pause.png", UriKind.Relative)).Stream);
+
+            if (Accelerometer.IsSupported)
+            {
+                // register shake event
+                ShakeGesturesHelper.Instance.ShakeGesture += new EventHandler<ShakeGestureEventArgs>(Instance_ShakeGesture);
+
+                // optional, set parameters
+                ShakeGesturesHelper.Instance.MinimumRequiredMovesForShake = 2;
+
+                // start shake detection
+                ShakeGesturesHelper.Instance.Active = true;
             }
-            // register shake event
-            ShakeGesturesHelper.Instance.ShakeGesture += new EventHandler<ShakeGestureEventArgs>(Instance_ShakeGesture);
+        }
 
-            // optional, set parameters
-            ShakeGesturesHelper.Instance.MinimumRequiredMovesForShake = 2;
+        void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Load Music Library
+            MediaLibrary library = new MediaLibrary();
 
-            // start shake detection
-            ShakeGesturesHelper.Instance.Active = true;
+            songCollection = library.Songs;
+            MediaPlayer.ActiveSongChanged += new EventHandler<EventArgs>(MediaPlayer_ActiveSongChanged);
+            MediaPlayer.MediaStateChanged += new EventHandler<EventArgs>(MediaPlayer_MediaStateChanged);
 
-            // Exemple de code pour la localisation d'ApplicationBar
-            //BuildLocalizedApplicationBar();
+            
+            UpdateCurrentSongInformation();
         }
 
         private void Instance_ShakeGesture(object sender, ShakeGestureEventArgs e)
@@ -49,80 +78,96 @@ namespace GesturesRecognizer
             Dispatcher.BeginInvoke(() =>
             {
                 ShakeType CurrentShakeType = e.ShakeType;
-                //statusTextBlock.Text = CurrentShakeType.ToString();
+                if (CurrentShakeType == ShakeType.Z)
+                {
+                    playStopBehavior();
+                }
 
             });
         }
 
-        private void startButton_Click(object sender, RoutedEventArgs e)
+        private void UpdateCurrentSongInformation()
         {
-            if (accelerometer == null)
+            if (MediaPlayer.Queue.Count != 0)
             {
-                // Instantiate the Accelerometer.
-                accelerometer = new Accelerometer();
-                accelerometer.TimeBetweenUpdates = TimeSpan.FromMilliseconds(20);
-                accelerometer.CurrentValueChanged +=
-                    new EventHandler<SensorReadingEventArgs<AccelerometerReading>>(accelerometer_CurrentValueChanged);
+                artistname_textfield.Text = MediaPlayer.Queue.ActiveSong.Artist.Name;
+                songname_textfield.Text = MediaPlayer.Queue.ActiveSong.Name;
+                cover_image.Opacity = 1.0;
+                BitmapImage bmp = new BitmapImage();
+                bmp.SetSource(MediaPlayer.Queue.ActiveSong.Album.GetAlbumArt());
+                cover_image.Source = bmp;
+            }
+            else
+            {
+                artistname_textfield.Text = "Tap the Play button";
+                songname_textfield.Text = "And start enhancing your music experience.";
+                if (this.songCollection.Count == 0)
+                {
+                    // Hide the element
+                    cover_image.Opacity = 0.0;
+                }
             }
 
-            try
+        }
+
+        void MediaPlayer_ActiveSongChanged(object sender, EventArgs e)
+        {
+            UpdateCurrentSongInformation();
+        }
+
+        void MediaPlayer_MediaStateChanged(object sender, EventArgs e)
+        {
+            switch (MediaPlayer.State)
             {
-                //statusTextBlock.Text = "starting accelerometer.";
-                accelerometer.Start();
-            }
-            catch (InvalidOperationException ex)
-            {
-                //statusTextBlock.Text = "unable to start accelerometer.";
+                case MediaState.Stopped:
+                    music_play_button.Source = playButton_Image;
+                    break;
+                case MediaState.Playing:
+                    music_play_button.Source = pauseButton_Image;
+                    break;
+                case MediaState.Paused:
+                    music_play_button.Source = playButton_Image;
+                    break;
             }
         }
 
-        void accelerometer_CurrentValueChanged(object sender, SensorReadingEventArgs<AccelerometerReading> e)
+        private void playStopBehavior()
         {
-            // Call UpdateUI on the UI thread and pass the AccelerometerReading.
-            Dispatcher.BeginInvoke(() => UpdateUI(e.SensorReading));
-        }
-
-        private void UpdateUI(AccelerometerReading accelerometerReading)
-        {
-            //statusTextBlock.Text = "getting data";
-
-            Vector3 acceleration = accelerometerReading.Acceleration;
-            /*
-            // Show the numeric values.
-            xTextBlock.Text = "X: " + acceleration.X.ToString("0.00");
-            yTextBlock.Text = "Y: " + acceleration.Y.ToString("0.00");
-            zTextBlock.Text = "Z: " + acceleration.Z.ToString("0.00");
-
-            // Show the values graphically.
-            xLine.X2 = xLine.X1 + acceleration.X * 200;
-            yLine.Y2 = yLine.Y1 - acceleration.Y * 200;
-            zLine.X2 = zLine.X1 - acceleration.Z * 100;
-            zLine.Y2 = zLine.Y1 + acceleration.Z * 100;*/
-        }
-
-        private void stopButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (accelerometer != null)
+            if (MediaPlayer.State == MediaState.Playing)
             {
-                // Stop the accelerometer.
-                accelerometer.Stop();
-                //statusTextBlock.Text = "accelerometer stopped.";
+                MediaPlayer.Pause();
+            }
+            else if (MediaPlayer.State == MediaState.Paused)
+            {
+                MediaPlayer.Resume();
+            }
+            else if (MediaPlayer.State == MediaState.Stopped)
+            {
+                if (songCollection.Count != 0)
+                {
+                    MediaPlayer.Play(songCollection);
+                }
+                else
+                {
+                    // Hide the element
+                    cover_image.Opacity = 0.0;
+                }
             }
         }
 
         private void music_play_button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-
+            playStopBehavior();
         }
 
         private void music_previous_button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-
+            MediaPlayer.MovePrevious();
         }
 
         private void music_next_button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-
+            MediaPlayer.MoveNext();
         }
 
     }
