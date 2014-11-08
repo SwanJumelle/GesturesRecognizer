@@ -63,6 +63,7 @@ namespace GesturesRecognizer
         void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             // Load Music Library
+            FrameworkDispatcher.Update();
             MediaLibrary library = new MediaLibrary();
 
             songCollection = library.Songs;
