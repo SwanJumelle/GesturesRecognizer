@@ -23,6 +23,8 @@ namespace GesturesRecognizer
         private BitmapImage playButton_Image;
         private BitmapImage pauseButton_Image;
 
+        private Boolean shakeEnabled;
+
         // Constructeur
         public MainPage()
         {
@@ -46,6 +48,8 @@ namespace GesturesRecognizer
             playButton_Image.SetSource(Application.GetResourceStream(new Uri(@"Assets/MusicPlayer/play.png", UriKind.Relative)).Stream);
             pauseButton_Image = new BitmapImage();
             pauseButton_Image.SetSource(Application.GetResourceStream(new Uri(@"Assets/MusicPlayer/pause.png", UriKind.Relative)).Stream);
+
+            shakeEnabled = false;
 
             if (Accelerometer.IsSupported)
             {
@@ -169,6 +173,26 @@ namespace GesturesRecognizer
         private void music_next_button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
             MediaPlayer.MoveNext();
+        }
+
+        private void Shake_Button_Click(Button sender, RoutedEventArgs e)
+        {
+            if (shakeEnabled)
+            {
+                sender.Content = "Shake: OFF";
+                // start accelerometer detection
+                ShakeGesturesHelper.Instance.Active = true;
+                // stop shake machine learning detection
+                shakeEnabled = !shakeEnabled;
+            }
+            else
+            {
+                sender.Content = "Shake: ON";
+                // stop accellerometer detection
+                ShakeGesturesHelper.Instance.Active = false;
+                // start shake machine learning detection
+                shakeEnabled = !shakeEnabled;
+            }
         }
 
     }
