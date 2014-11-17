@@ -63,6 +63,12 @@
             <Image x:Name="music_play_button" Source="/Assets/MusicPlayer/play.png" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="80" Height="80" Margin="0,0,0,50" Tap="music_play_button_Tap" />
             <Image x:Name="music_next_button" Source="/Assets/MusicPlayer/next.png" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="80" Height="80" Margin="0,0,80,50" Tap="music_next_button_Tap" />
             <Button x:Name="Shake_Button" Content="Shake: Off" HorizontalAlignment="Center" Margin="0,90,0,0" VerticalAlignment="Top" Tap="Shake_Button_Tap"/>
+            <Button x:Name="start_accelero_button" Content="Start" HorizontalAlignment="Right" Margin="20,0,-20,0" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                <Button.RenderTransform>
+                    <CompositeTransform Rotation="-90"/>
+                </Button.RenderTransform>
+            </Button>
+
         </Grid>
     </Grid>
 

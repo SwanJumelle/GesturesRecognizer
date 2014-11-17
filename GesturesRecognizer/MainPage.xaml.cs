@@ -24,6 +24,11 @@ namespace GesturesRecognizer
         private BitmapImage pauseButton_Image;
 
         private Boolean shakeEnabled;
+        private Boolean detectionStarted;
+        Accelerometer accelerometer;
+
+        alglib.clusterizerstate s;
+        alglib.kmeansreport rep;
 
         // Constructeur
         public MainPage()
@@ -50,6 +55,8 @@ namespace GesturesRecognizer
             pauseButton_Image.SetSource(Application.GetResourceStream(new Uri(@"Assets/MusicPlayer/pause.png", UriKind.Relative)).Stream);
 
             shakeEnabled = false;
+            detectionStarted = false;
+            this.start_accelero_button.Visibility = System.Windows.Visibility.Collapsed;
 
             if (Accelerometer.IsSupported)
             {
@@ -86,6 +93,14 @@ namespace GesturesRecognizer
                 if (CurrentShakeType == ShakeType.Z)
                 {
                     playStopBehavior();
+                }
+                if (CurrentShakeType == ShakeType.X)
+                {
+                    MediaPlayer.MoveNext();
+                }
+                if (CurrentShakeType == ShakeType.Y)
+                {
+                    MediaPlayer.MovePrevious();
                 }
 
             });
@@ -136,6 +151,14 @@ namespace GesturesRecognizer
             }
         }
 
+        private void launch_kmeans()
+        {
+            alglib.clusterizercreate(out s);
+            alglib.clusterizersetpoints(s, coords, 2);
+            alglib.clusterizersetkmeanslimits(s, 5, 0);
+            alglib.clusterizerrunkmeans(s, 2, out rep);
+        }
+
         private void playStopBehavior()
         {
             if (MediaPlayer.State == MediaState.Playing)
@@ -175,6 +198,24 @@ namespace GesturesRecognizer
             MediaPlayer.MoveNext();
         }
 
+        private void clusterize()
+        {
+            this.launch_kmeans();
+            "Cluster : {" + Math.Round(rep.c[0, 0], 3) + ", " + 
+                Math.Round(rep.c[0, 1], 3) + ", " +
+                Math.Round(rep.c[0, 2], 3) +
+                "} \nNombre de points : " +
+                count_points(0, rep.cidx);
+        }
+
+        private int count_points(int clusterindex, int[] points)
+        {
+            int count = 0;
+
+            for (int i = 0; i < Y.Count; i++) { if (points[i] == clusterindex) count++; }
+
+            return count;
+        }
 
         private void Shake_Button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
@@ -182,6 +223,7 @@ namespace GesturesRecognizer
             if (shakeEnabled)
             {
                 b.Content = "Shake: OFF";
+                this.start_accelero_button.Visibility = System.Windows.Visibility.Collapsed;
                 // start accelerometer detection
                 ShakeGesturesHelper.Instance.Active = true;
                 // stop shake machine learning detection
@@ -190,11 +232,61 @@ namespace GesturesRecognizer
             else
             {
                 b.Content = "Shake: ON";
+                this.start_accelero_button.Visibility = System.Windows.Visibility.Visible;
                 // stop accellerometer detection
                 ShakeGesturesHelper.Instance.Active = false;
                 // start shake machine learning detection
+                clusterize();
                 shakeEnabled = !shakeEnabled;
             }
+        }
+
+        private void start_accelero_button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        {
+            if (accelerometer == null)
+            {
+                // Instantiate the Accelerometer.
+                accelerometer = new Accelerometer();
+                accelerometer.TimeBetweenUpdates = TimeSpan.FromMilliseconds(20);
+                accelerometer.CurrentValueChanged +=
+                new EventHandler<SensorReadingEventArgs<AccelerometerReading>>(accelerometer_CurrentValueChanged);
+            }
+
+            if (!detectionStarted)
+            {
+                // Start detection
+                try
+                {
+                    //statusTextBlock.Text = "starting accelerometer.";
+                    accelerometer.Start();
+                }
+                catch (InvalidOperationException ex)
+                {
+                }
+            }
+            else
+            {
+                // Stop detection
+                if (accelerometer != null)
+                {
+                    accelerometer.Stop();
+                }
+            }
+
+        }
+
+        void accelerometer_CurrentValueChanged(object sender, SensorReadingEventArgs<AccelerometerReading> e)
+        {
+            Dispatcher.BeginInvoke(() => getAccValues(e.SensorReading));
+        }
+
+        private void getAccValues(AccelerometerReading accelerometerReading)
+        {
+
+            Vector3 acceleration = accelerometerReading.Acceleration;
+            System.Diagnostics.Debug.WriteLine("X: " + acceleration.X.ToString("0.00"));
+            System.Diagnostics.Debug.WriteLine("Y: " + acceleration.Y.ToString("0.00"));
+            System.Diagnostics.Debug.WriteLine("Z: " + acceleration.Z.ToString("0.00"));
         }
 
     }
