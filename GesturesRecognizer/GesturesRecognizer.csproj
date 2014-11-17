@@ -93,6 +93,19 @@
     <Compile Include="AccelerometerHelper\AccelerometerHelper.cs" />
     <Compile Include="AccelerometerHelper\ApplicationSettingHelper.cs" />
     <Compile Include="AccelerometerHelper\Simple3DVector.cs" />
+    <Compile Include="alglib\src\alglibinternal.cs" />
+    <Compile Include="alglib\src\alglibmisc.cs" />
+    <Compile Include="alglib\src\ap.cs" />
+    <Compile Include="alglib\src\dataanalysis.cs" />
+    <Compile Include="alglib\src\diffequations.cs" />
+    <Compile Include="alglib\src\fasttransforms.cs" />
+    <Compile Include="alglib\src\integration.cs" />
+    <Compile Include="alglib\src\interpolation.cs" />
+    <Compile Include="alglib\src\linalg.cs" />
+    <Compile Include="alglib\src\optimization.cs" />
+    <Compile Include="alglib\src\solvers.cs" />
+    <Compile Include="alglib\src\specialfunctions.cs" />
+    <Compile Include="alglib\src\statistics.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -124,6 +137,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="alglib\alglibnet2.dll" />
+    <Content Include="alglib\gpl2.txt" />
+    <Content Include="alglib\gpl3.txt" />
+    <Content Include="alglib\manual.csharp.html" />
     <Content Include="Assets\AlignmentGrid.png" />
     <Content Include="Assets\ApplicationIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

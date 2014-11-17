@@ -153,10 +153,10 @@ namespace GesturesRecognizer
 
         private void launch_kmeans()
         {
-            alglib.clusterizercreate(out s);
-            alglib.clusterizersetpoints(s, coords, 2);
-            alglib.clusterizersetkmeanslimits(s, 5, 0);
-            alglib.clusterizerrunkmeans(s, 2, out rep);
+            //alglib.clusterizercreate(out s);
+            //alglib.clusterizersetpoints(s, coords, 2);
+           // alglib.clusterizersetkmeanslimits(s, 5, 0);
+           // alglib.clusterizerrunkmeans(s, 2, out rep);
         }
 
         private void playStopBehavior()
@@ -200,21 +200,8 @@ namespace GesturesRecognizer
 
         private void clusterize()
         {
-            this.launch_kmeans();
-            "Cluster : {" + Math.Round(rep.c[0, 0], 3) + ", " + 
-                Math.Round(rep.c[0, 1], 3) + ", " +
-                Math.Round(rep.c[0, 2], 3) +
-                "} \nNombre de points : " +
-                count_points(0, rep.cidx);
-        }
-
-        private int count_points(int clusterindex, int[] points)
-        {
-            int count = 0;
-
-            for (int i = 0; i < Y.Count; i++) { if (points[i] == clusterindex) count++; }
-
-            return count;
+            //this.launch_kmeans();
+             //System.Diagnostics.Debug.WriteLine("Cluster : {" + Math.Round(rep.c[0, 0], 3) + ", " + Math.Round(rep.c[0, 1], 3) + ", " + Math.Round(rep.c[0, 2], 3) + "}");
         }
 
         private void Shake_Button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
@@ -235,23 +222,23 @@ namespace GesturesRecognizer
                 this.start_accelero_button.Visibility = System.Windows.Visibility.Visible;
                 // stop accellerometer detection
                 ShakeGesturesHelper.Instance.Active = false;
-                // start shake machine learning detection
-                clusterize();
                 shakeEnabled = !shakeEnabled;
             }
         }
 
         private void start_accelero_button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine("CACA");
             if (accelerometer == null)
             {
                 // Instantiate the Accelerometer.
                 accelerometer = new Accelerometer();
-                accelerometer.TimeBetweenUpdates = TimeSpan.FromMilliseconds(20);
+                accelerometer.TimeBetweenUpdates = TimeSpan.FromMilliseconds(50);
                 accelerometer.CurrentValueChanged +=
                 new EventHandler<SensorReadingEventArgs<AccelerometerReading>>(accelerometer_CurrentValueChanged);
             }
 
+            System.Diagnostics.Debug.WriteLine("CACA2");
             if (!detectionStarted)
             {
                 // Start detection
@@ -259,9 +246,13 @@ namespace GesturesRecognizer
                 {
                     //statusTextBlock.Text = "starting accelerometer.";
                     accelerometer.Start();
+                    Button b = (Button)sender;
+                    b.Content = "Stop";
+                    detectionStarted = !detectionStarted;
                 }
                 catch (InvalidOperationException ex)
                 {
+                    System.Diagnostics.Debug.WriteLine("Accelerator not supported");
                 }
             }
             else
@@ -270,6 +261,11 @@ namespace GesturesRecognizer
                 if (accelerometer != null)
                 {
                     accelerometer.Stop();
+                    clusterize();
+
+                    Button b = (Button)sender;
+                    b.Content = "Start";
+                    detectionStarted = !detectionStarted;
                 }
             }
 
