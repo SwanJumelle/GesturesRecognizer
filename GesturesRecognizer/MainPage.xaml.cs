@@ -26,9 +26,13 @@ namespace GesturesRecognizer
         private Boolean shakeEnabled;
         private Boolean detectionStarted;
         Accelerometer accelerometer;
-
+        private int counter = 0;
+        private double[,] coords;
+        private Boolean isOK;
+        private int clusterOuCaBougePas;
         alglib.clusterizerstate s;
         alglib.kmeansreport rep;
+        private int clusterOuCaBouge;
 
         // Constructeur
         public MainPage()
@@ -56,7 +60,12 @@ namespace GesturesRecognizer
 
             shakeEnabled = false;
             detectionStarted = false;
-            this.start_accelero_button.Visibility = System.Windows.Visibility.Collapsed;
+            isOK = false;
+            coords = new double[,] { {0.0f,0.0f} };
+
+            launch_kmeans(InitClustering.init());
+
+             this.start_accelero_button.Visibility = System.Windows.Visibility.Collapsed;
 
             if (Accelerometer.IsSupported)
             {
@@ -151,12 +160,12 @@ namespace GesturesRecognizer
             }
         }
 
-        private void launch_kmeans()
+        private void launch_kmeans(double[,] elcoords)
         {
-            //alglib.clusterizercreate(out s);
-            //alglib.clusterizersetpoints(s, coords, 2);
-           // alglib.clusterizersetkmeanslimits(s, 5, 0);
-           // alglib.clusterizerrunkmeans(s, 2, out rep);
+            alglib.clusterizercreate(out s);
+            alglib.clusterizersetpoints(s, elcoords, 2);
+            alglib.clusterizersetkmeanslimits(s, 5, 0);
+            alglib.clusterizerrunkmeans(s, 2, out rep);
         }
 
         private void playStopBehavior()
@@ -178,7 +187,7 @@ namespace GesturesRecognizer
                 else
                 {
                     // Hide the element
-                    cover_image.Opacity = 0.0;
+                    //cover_image.Opacity = 0.0;
                 }
             }
         }
@@ -196,12 +205,6 @@ namespace GesturesRecognizer
         private void music_next_button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
             MediaPlayer.MoveNext();
-        }
-
-        private void clusterize()
-        {
-            //this.launch_kmeans();
-             //System.Diagnostics.Debug.WriteLine("Cluster : {" + Math.Round(rep.c[0, 0], 3) + ", " + Math.Round(rep.c[0, 1], 3) + ", " + Math.Round(rep.c[0, 2], 3) + "}");
         }
 
         private void Shake_Button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
@@ -228,17 +231,15 @@ namespace GesturesRecognizer
 
         private void start_accelero_button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine("CACA");
+            
             if (accelerometer == null)
             {
                 // Instantiate the Accelerometer.
                 accelerometer = new Accelerometer();
-                accelerometer.TimeBetweenUpdates = TimeSpan.FromMilliseconds(50);
+                accelerometer.TimeBetweenUpdates = TimeSpan.FromMilliseconds(100);
                 accelerometer.CurrentValueChanged +=
                 new EventHandler<SensorReadingEventArgs<AccelerometerReading>>(accelerometer_CurrentValueChanged);
             }
-
-            System.Diagnostics.Debug.WriteLine("CACA2");
             if (!detectionStarted)
             {
                 // Start detection
@@ -247,6 +248,7 @@ namespace GesturesRecognizer
                     accelerometer.Start();
                     Button b = (Button)sender;
                     b.Content = "Stop";
+                    b.IsEnabled = false;
                     detectionStarted = !detectionStarted;
                 }
                 catch (InvalidOperationException ex)
@@ -254,35 +256,76 @@ namespace GesturesRecognizer
                     System.Diagnostics.Debug.WriteLine("Accelerator not supported");
                 }
             }
-            else
-            {
-                // Stop detection
-                if (accelerometer != null)
-                {
-                    accelerometer.Stop();
-                    clusterize();
-
-                    Button b = (Button)sender;
-                    b.Content = "Start";
-                    detectionStarted = !detectionStarted;
-                }
-            }
-
         }
 
         void accelerometer_CurrentValueChanged(object sender, SensorReadingEventArgs<AccelerometerReading> e)
         {
-            Dispatcher.BeginInvoke(() => getAccValues(e.SensorReading));
+            Vector3 acceleration = e.SensorReading.Acceleration;
+            coords[0,0] += Math.Abs(acceleration.X);
+            coords[0,1] += Math.Abs(acceleration.Y);
+
+
+            counter ++;
+            if (counter == 20)
+            {
+                // AVG
+                coords[0,0] /= 20;
+                coords[0,1] /= 20;
+
+                
+                System.Diagnostics.Debug.WriteLine("{"+ coords[0,0] + "," + coords[0,1] + "}," );
+                //System.Diagnostics.Debug.WriteLine("NBPOINTS: " + rep.npoints + " NBFEATURES: " + rep.nfeatures);
+                //alglib.clusterizergetdistances(coords, rep.npoints, rep.nfeatures, 2, out result);
+                //System.Diagnostics.Debug.WriteLine("RESULT: " + result);
+
+                if (!isOK)
+                {
+
+                    double distanceA = Math.Sqrt((Math.Pow(rep.c[0, 0] - coords[0, 0], 2) + Math.Pow(rep.c[0, 1] - coords[0, 1], 2)));
+                    double distanceB = Math.Sqrt((Math.Pow(rep.c[1, 0] - coords[0, 0], 2) + Math.Pow(rep.c[1, 1] - coords[0, 1], 2)));
+
+                    if (distanceA > distanceB)
+                    {
+                        clusterOuCaBougePas = 1;
+                        clusterOuCaBouge = 0;
+                    }
+                    else
+                    {
+                        clusterOuCaBougePas = 0;
+                        clusterOuCaBouge = 1;
+                    }
+                    isOK = !isOK;
+                }
+                else
+                {
+                    double distanceCaBouge = Math.Sqrt((Math.Pow(rep.c[clusterOuCaBouge, 0] - coords[0, 0], 2) + Math.Pow(rep.c[clusterOuCaBouge, 1] - coords[0, 1], 2)));
+                    double distanceCaBougePas = Math.Sqrt((Math.Pow(rep.c[clusterOuCaBougePas, 0] - coords[0, 0], 2) + Math.Pow(rep.c[clusterOuCaBougePas, 1] - coords[0, 1], 2)));
+                    if (distanceCaBouge < distanceCaBougePas)
+                    {
+                        System.Diagnostics.Debug.WriteLine("SHAKE IT BABY!");
+                        playStopBehavior();
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine("YOU DON'T MOVE, BITCH!");
+                    }
+                }
+
+
+                counter = 0;
+                Dispatcher.BeginInvoke(() => UpdateUI());
+                detectionStarted = !detectionStarted;
+
+                
+                coords[0, 0] = 0.0f;
+                coords[0, 1] = 0.0f;
+            }
         }
 
-        private void getAccValues(AccelerometerReading accelerometerReading)
+        private void UpdateUI()
         {
-
-            Vector3 acceleration = accelerometerReading.Acceleration;
-            System.Diagnostics.Debug.WriteLine("X: " + acceleration.X.ToString("0.00"));
-            System.Diagnostics.Debug.WriteLine("Y: " + acceleration.Y.ToString("0.00"));
-            System.Diagnostics.Debug.WriteLine("Z: " + acceleration.Z.ToString("0.00"));
+            start_accelero_button.Content = "Start";
+            start_accelero_button.IsEnabled = true;
         }
-
     }
 }
