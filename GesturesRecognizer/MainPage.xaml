@@ -62,7 +62,7 @@
             <Image x:Name="music_previous_button" Source="/Assets/MusicPlayer/back.png" HorizontalAlignment="Left" VerticalAlignment="Bottom" Width="80" Height="80" Margin="80,0,0,50" Tap="music_previous_button_Tap" />
             <Image x:Name="music_play_button" Source="/Assets/MusicPlayer/play.png" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="80" Height="80" Margin="0,0,0,50" Tap="music_play_button_Tap" />
             <Image x:Name="music_next_button" Source="/Assets/MusicPlayer/next.png" HorizontalAlignment="Right" VerticalAlignment="Bottom" Width="80" Height="80" Margin="0,0,80,50" Tap="music_next_button_Tap" />
-            <Button Content="Shake: Off" HorizontalAlignment="Center" Margin="0,85,0,0" VerticalAlignment="Top" Click="Shake_Button_Click"/>
+            <Button x:Name="Shake_Button" Content="Shake: Off" HorizontalAlignment="Center" Margin="0,90,0,0" VerticalAlignment="Top" Tap="Shake_Button_Tap"/>
         </Grid>
     </Grid>
 

@@ -175,11 +175,13 @@ namespace GesturesRecognizer
             MediaPlayer.MoveNext();
         }
 
-        private void Shake_Button_Click(Button sender, RoutedEventArgs e)
+
+        private void Shake_Button_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
+            Button b = (Button)sender;
             if (shakeEnabled)
             {
-                sender.Content = "Shake: OFF";
+                b.Content = "Shake: OFF";
                 // start accelerometer detection
                 ShakeGesturesHelper.Instance.Active = true;
                 // stop shake machine learning detection
@@ -187,7 +189,7 @@ namespace GesturesRecognizer
             }
             else
             {
-                sender.Content = "Shake: ON";
+                b.Content = "Shake: ON";
                 // stop accellerometer detection
                 ShakeGesturesHelper.Instance.Active = false;
                 // start shake machine learning detection
