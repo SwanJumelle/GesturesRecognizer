@@ -244,7 +244,6 @@ namespace GesturesRecognizer
                 // Start detection
                 try
                 {
-                    //statusTextBlock.Text = "starting accelerometer.";
                     accelerometer.Start();
                     Button b = (Button)sender;
                     b.Content = "Stop";
